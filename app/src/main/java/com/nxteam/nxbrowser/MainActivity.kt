@@ -52,6 +52,16 @@ class MainActivity : ComponentActivity(), BrowserHost {
         filePathCallback = null
     }
 
+    private val extensionPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            val app = application as NXApplication
+            val result = app.extensionManager.install(uri)
+            Toast.makeText(this, result.message, Toast.LENGTH_LONG).show()
+        }
+    }
+
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { granted ->
@@ -228,6 +238,14 @@ class MainActivity : ComponentActivity(), BrowserHost {
         startActivity(Intent.createChooser(intent, "Paylaş"))
     }
 
+    override fun pickExtensionPackage() {
+        try {
+            extensionPickerLauncher.launch(arrayOf("*/*"))
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, "Dosya seçici bulunamadı", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun launchExternalIntent(url: String): Boolean {
         return try {
             val intent = if (url.startsWith("intent:")) {
@@ -248,12 +266,26 @@ class MainActivity : ComponentActivity(), BrowserHost {
         finish()
     }
 
+    override fun onStop() {
+        super.onStop()
+        val app = application as NXApplication
+        if (app.settings.current.restoreTabs) {
+            app.session.save(app.tabManager)
+        }
+    }
+
     override fun onDestroy() {
         val app = application as NXApplication
         if (isFinishing) {
+            if (app.settings.current.restoreTabs) {
+                app.session.save(app.tabManager)
+            } else {
+                app.session.clear()
+            }
             val clearOnExit = app.settings.current.clearOnExit
             app.tabManager.closeEverything()
             if (clearOnExit) {
+                app.session.clear()
                 app.appScope.launch {
                     DataCleaner.clear(app, app.database, ClearOptions(bookmarks = false))
                 }

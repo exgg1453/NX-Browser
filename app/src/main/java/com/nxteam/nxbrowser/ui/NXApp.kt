@@ -54,7 +54,14 @@ fun NXApp(host: BrowserHost, pendingUrl: String?, onPendingUrlConsumed: () -> Un
 
     LaunchedEffect(Unit) {
         if (tabManager.tabs.isEmpty()) {
-            tabManager.newTab(incognito = false)
+            val restored = if (app.settings.current.restoreTabs) {
+                app.session.restore(tabManager)
+            } else {
+                false
+            }
+            if (!restored) {
+                tabManager.newTab(incognito = false)
+            }
         }
     }
 
@@ -188,7 +195,11 @@ fun NXApp(host: BrowserHost, pendingUrl: String?, onPendingUrlConsumed: () -> Un
             }
 
             ROUTE_EXTENSIONS -> {
-                ExtensionsScreen(onBack = { route = ROUTE_BROWSER })
+                ExtensionsScreen(
+                    manager = app.extensionManager,
+                    onInstall = { host.pickExtensionPackage() },
+                    onBack = { route = ROUTE_BROWSER }
+                )
                 BackHandler { route = ROUTE_BROWSER }
             }
 
@@ -262,8 +273,8 @@ fun NXApp(host: BrowserHost, pendingUrl: String?, onPendingUrlConsumed: () -> Un
                         current != null && !current.showHome && current.canGoBack -> {
                             current.webView?.goBack()
                         }
-                        current != null && !current.showHome -> {
-                            current.showHome = true
+                        current != null && current.showHome && current.hasPage -> {
+                            current.showHome = false
                         }
                         tabManager.visibleTabs(tabManager.incognitoMode).size > 1 && current != null -> {
                             tabManager.closeTab(current.id)
@@ -318,12 +329,15 @@ fun NXApp(host: BrowserHost, pendingUrl: String?, onPendingUrlConsumed: () -> Un
                     showMenu = false
                 },
                 onToggleDesktop = { enabled ->
+                    tab.desktopMode = enabled
                     val webView = tab.webView
-                    if (webView != null) {
+                    if (webView != null && tab.hasPage) {
                         WebViewFactory.applyDesktopMode(webView, tab, enabled)
-                    } else {
-                        tab.desktopMode = enabled
                     }
+                    if (tab.hasPage) {
+                        tab.showHome = false
+                    }
+                    showMenu = false
                 },
                 onOpenSettings = {
                     showMenu = false

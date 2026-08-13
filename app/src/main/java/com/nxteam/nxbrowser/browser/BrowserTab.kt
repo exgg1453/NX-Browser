@@ -39,9 +39,12 @@ class BrowserTab(
 
     val displayTitle: String
         get() = when {
-            showHome -> if (incognito) "Gizli sekme" else "Yeni sekme"
-            title.isNotBlank() -> title
+            title.isNotBlank() && url.isNotBlank() -> title
             url.isNotBlank() -> url
+            incognito -> "Gizli sekme"
             else -> "Yeni sekme"
         }
+
+    val hasPage: Boolean
+        get() = url.isNotBlank() && url != "about:blank"
 }

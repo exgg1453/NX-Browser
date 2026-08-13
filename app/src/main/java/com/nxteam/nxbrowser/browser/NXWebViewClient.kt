@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.nxteam.nxbrowser.NXApplication
 import com.nxteam.nxbrowser.data.HistoryEntry
 import com.nxteam.nxbrowser.data.HistoryDao
 import com.nxteam.nxbrowser.util.UrlUtils
@@ -37,6 +38,7 @@ class NXWebViewClient(
         tab.showHome = false
         tab.canGoBack = view.canGoBack()
         tab.canGoForward = view.canGoForward()
+        injectContentScripts(view, url, "document_start")
     }
 
     override fun onPageFinished(view: WebView, url: String) {
@@ -48,6 +50,16 @@ class NXWebViewClient(
         tab.canGoBack = view.canGoBack()
         tab.canGoForward = view.canGoForward()
         recordHistory(url, tab.title)
+        injectContentScripts(view, url, "document_end")
+        injectContentScripts(view, url, "document_idle")
+    }
+
+    private fun injectContentScripts(view: WebView, url: String, runAt: String) {
+        val manager = NXApplication.instance.extensionManager
+        val payloads = manager.scriptsFor(url, runAt)
+        for (payload in payloads) {
+            view.evaluateJavascript(payload, null)
+        }
     }
 
     override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {

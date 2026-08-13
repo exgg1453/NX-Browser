@@ -58,6 +58,36 @@ class TabManager {
         val tab = tabs.firstOrNull { it.id == id } ?: return
         currentTabId = tab.id
         incognitoMode = tab.incognito
+        if (tab.hasPage) {
+            tab.showHome = false
+        }
+    }
+
+    fun restoreTab(
+        id: String,
+        url: String,
+        title: String,
+        groupId: String?,
+        desktopMode: Boolean
+    ): BrowserTab {
+        val tab = BrowserTab(id = id, incognito = false)
+        tab.url = url
+        tab.title = title
+        tab.groupId = groupId
+        tab.desktopMode = desktopMode
+        tab.showHome = url.isBlank()
+        tabs.add(tab)
+        return tab
+    }
+
+    fun restoreGroup(id: String, name: String, color: Long) {
+        groups.add(TabGroup(id, name, color))
+    }
+
+    fun setCurrentTabId(id: String?) {
+        val tab = tabs.firstOrNull { it.id == id }
+        currentTabId = tab?.id ?: tabs.firstOrNull { !it.incognito }?.id
+        incognitoMode = false
     }
 
     fun closeTab(id: String) {

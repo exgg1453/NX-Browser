@@ -31,6 +31,8 @@ interface BrowserHost {
 
     fun shareUrl(url: String, title: String)
 
+    fun pickExtensionPackage()
+
     fun launchExternalIntent(url: String): Boolean
 
     fun exitApp()

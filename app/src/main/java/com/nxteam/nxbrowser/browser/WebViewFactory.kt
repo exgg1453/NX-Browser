@@ -97,12 +97,19 @@ object WebViewFactory {
 
     fun applyDesktopMode(webView: WebView, tab: BrowserTab, enabled: Boolean) {
         tab.desktopMode = enabled
-        webView.settings.userAgentString = if (enabled) {
-            UserAgents.DESKTOP
+        val settings = webView.settings
+        settings.userAgentString = if (enabled) UserAgents.DESKTOP else null
+        settings.useWideViewPort = true
+        settings.loadWithOverviewMode = true
+        settings.setSupportZoom(true)
+        settings.builtInZoomControls = true
+        settings.displayZoomControls = false
+        val url = tab.url
+        if (url.isNotBlank() && url != "about:blank") {
+            webView.loadUrl(url)
         } else {
-            null
+            webView.reload()
         }
-        webView.reload()
     }
 
     fun applyPrefs(webView: WebView, prefs: Prefs) {

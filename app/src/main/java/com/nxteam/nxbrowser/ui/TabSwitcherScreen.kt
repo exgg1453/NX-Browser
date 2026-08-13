@@ -19,15 +19,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.LayersClear
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -45,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,7 +61,6 @@ import com.nxteam.nxbrowser.browser.TabGroup
 import com.nxteam.nxbrowser.browser.TabManager
 import com.nxteam.nxbrowser.util.UrlUtils
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TabSwitcherScreen(
     tabManager: TabManager,
@@ -81,7 +87,7 @@ fun TabSwitcherScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             ModeToggle(
@@ -92,11 +98,26 @@ fun TabSwitcherScreen(
             )
             Spacer(Modifier.weight(1f))
             if (selection.isNotEmpty()) {
+                Text(
+                    text = selection.size.toString(),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 IconButton(onClick = { showGroupDialog = true }) {
                     Icon(
                         imageVector = Icons.Filled.CreateNewFolder,
                         contentDescription = "Grup oluştur",
                         tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                IconButton(onClick = {
+                    tabManager.assignToGroup(selection, null)
+                    selection = emptySet()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.LayersClear,
+                        contentDescription = "Gruptan çıkar",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 IconButton(onClick = {
@@ -107,6 +128,13 @@ fun TabSwitcherScreen(
                         imageVector = Icons.Filled.DeleteSweep,
                         contentDescription = "Seçilenleri kapat",
                         tint = MaterialTheme.colorScheme.error
+                    )
+                }
+                IconButton(onClick = { selection = emptySet() }) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Seçimi bırak",
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             } else {
@@ -145,17 +173,24 @@ fun TabSwitcherScreen(
             return@Column
         }
 
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxSize(),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                start = 12.dp,
-                end = 12.dp,
-                bottom = 24.dp
-            )
+                start = 10.dp,
+                end = 10.dp,
+                bottom = 28.dp
+            ),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             groups.forEach { group ->
                 val groupTabs = tabManager.tabsInGroup(group.id, incognito)
-                item(key = "group_${group.id}") {
+
+                item(
+                    key = "header_" + group.id,
+                    span = { GridItemSpan(maxLineSpan) }
+                ) {
                     GroupHeader(
                         group = group,
                         count = groupTabs.size,
@@ -165,13 +200,14 @@ fun TabSwitcherScreen(
                         onUngroup = { tabManager.ungroup(group.id) }
                     )
                 }
+
                 if (!group.collapsed) {
                     items(
                         count = groupTabs.size,
                         key = { index -> "gt_" + groupTabs[index].id }
                     ) { index ->
                         val tab = groupTabs[index]
-                        TabRow(
+                        TabCard(
                             tab = tab,
                             accent = Color(group.color),
                             selected = selection.contains(tab.id),
@@ -193,22 +229,25 @@ fun TabSwitcherScreen(
 
             if (ungrouped.isNotEmpty()) {
                 if (groups.isNotEmpty()) {
-                    item(key = "ungrouped_title") {
-                        Spacer(Modifier.height(12.dp))
+                    item(
+                        key = "header_ungrouped",
+                        span = { GridItemSpan(maxLineSpan) }
+                    ) {
                         SectionTitle(
                             text = "Gruplanmamış",
-                            modifier = Modifier.padding(start = 10.dp, bottom = 6.dp)
+                            modifier = Modifier.padding(start = 6.dp, top = 8.dp)
                         )
                     }
                 }
+
                 items(
                     count = ungrouped.size,
                     key = { index -> "ut_" + ungrouped[index].id }
                 ) { index ->
                     val tab = ungrouped[index]
-                    TabRow(
+                    TabCard(
                         tab = tab,
-                        accent = MaterialTheme.colorScheme.outline,
+                        accent = MaterialTheme.colorScheme.primary,
                         selected = selection.contains(tab.id),
                         selectionMode = selection.isNotEmpty(),
                         isCurrent = tabManager.currentTabId == tab.id,
@@ -230,6 +269,7 @@ fun TabSwitcherScreen(
     if (showGroupDialog) {
         GroupDialog(
             initialName = "Yeni grup",
+            initialColor = TabGroup.COLORS.first(),
             title = "Grup oluştur",
             onDismiss = { showGroupDialog = false },
             onConfirm = { name, color ->
@@ -246,6 +286,7 @@ fun TabSwitcherScreen(
         val group = tabManager.groups.firstOrNull { it.id == renaming }
         GroupDialog(
             initialName = group?.name ?: "",
+            initialColor = group?.color ?: TabGroup.COLORS.first(),
             title = "Grubu düzenle",
             onDismiss = { renameGroupId = null },
             onConfirm = { name, color ->
@@ -275,12 +316,12 @@ private fun ModeToggle(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             ModeChip(
-                label = "Sekmeler ($normalCount)",
+                label = "Sekmeler $normalCount",
                 active = !incognito,
                 onClick = { onSwitchMode(false) }
             )
             ModeChip(
-                label = "Gizli ($incognitoCount)",
+                label = "Gizli $incognitoCount",
                 active = incognito,
                 onClick = { onSwitchMode(true) }
             )
@@ -294,11 +335,9 @@ private fun ModeChip(label: String, active: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .height(38.dp)
             .clip(RoundedCornerShape(19.dp))
-            .background(
-                if (active) MaterialTheme.colorScheme.primary else Color.Transparent
-            )
+            .background(if (active) MaterialTheme.colorScheme.primary else Color.Transparent)
             .clickable { onClick() }
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 14.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -325,7 +364,7 @@ private fun GroupHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 12.dp, bottom = 4.dp, start = 4.dp, end = 4.dp),
+            .padding(top = 10.dp, start = 6.dp, end = 2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -338,8 +377,7 @@ private fun GroupHeader(
         Text(
             text = group.name,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.clickable { onRename() }
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(Modifier.width(8.dp))
         Text(
@@ -348,15 +386,23 @@ private fun GroupHeader(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.weight(1f))
-        IconButton(onClick = onUngroup, modifier = Modifier.size(34.dp)) {
+        IconButton(onClick = onRename, modifier = Modifier.size(32.dp)) {
             Icon(
-                imageVector = Icons.Filled.Close,
+                imageVector = Icons.Filled.Edit,
+                contentDescription = "Düzenle",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        IconButton(onClick = onUngroup, modifier = Modifier.size(32.dp)) {
+            Icon(
+                imageVector = Icons.Filled.LayersClear,
                 contentDescription = "Grubu dağıt",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )
         }
-        IconButton(onClick = onCloseGroup, modifier = Modifier.size(34.dp)) {
+        IconButton(onClick = onCloseGroup, modifier = Modifier.size(32.dp)) {
             Icon(
                 imageVector = Icons.Filled.DeleteSweep,
                 contentDescription = "Grubu kapat",
@@ -364,7 +410,7 @@ private fun GroupHeader(
                 modifier = Modifier.size(18.dp)
             )
         }
-        IconButton(onClick = onToggle, modifier = Modifier.size(34.dp)) {
+        IconButton(onClick = onToggle, modifier = Modifier.size(32.dp)) {
             Icon(
                 imageVector = if (group.collapsed) Icons.Filled.ExpandMore else Icons.Filled.ExpandLess,
                 contentDescription = "Aç kapa",
@@ -377,7 +423,7 @@ private fun GroupHeader(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TabRow(
+private fun TabCard(
     tab: BrowserTab,
     accent: Color,
     selected: Boolean,
@@ -387,77 +433,142 @@ private fun TabRow(
     onLongClick: () -> Unit,
     onClose: () -> Unit
 ) {
+    val host = UrlUtils.host(tab.url)
+    val borderColor = when {
+        selected -> MaterialTheme.colorScheme.primary
+        isCurrent -> accent
+        else -> Color.Transparent
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .height(210.dp)
+            .clip(RoundedCornerShape(18.dp))
             .border(
-                width = if (selected || isCurrent) 2.dp else 0.dp,
-                color = when {
-                    selected -> MaterialTheme.colorScheme.primary
-                    isCurrent -> accent
-                    else -> Color.Transparent
+                width = if (selected || isCurrent) 2.dp else 1.dp,
+                color = if (borderColor == Color.Transparent) {
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                } else {
+                    borderColor
                 },
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(18.dp)
             )
             .combinedClickable(onClick = onClick, onLongClick = onLongClick),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 1.dp
+        tonalElevation = 2.dp
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (tab.incognito) {
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
-                ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, end = 4.dp, top = 8.dp, bottom = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (tab.incognito) {
                     Icon(
                         imageVector = Icons.Filled.VisibilityOff,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
+                    )
+                } else {
+                    SiteAvatar(
+                        host = host,
+                        label = tab.displayTitle,
+                        size = 18.dp,
+                        corner = 6.dp
                     )
                 }
-            } else {
-                SiteAvatar(
-                    host = UrlUtils.host(tab.url),
-                    label = tab.displayTitle,
-                    size = 38.dp,
-                    corner = 12.dp
-                )
-            }
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
+                Spacer(Modifier.width(8.dp))
                 Text(
                     text = tab.displayTitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = if (tab.showHome) "Ana sayfa" else UrlUtils.prettyUrl(tab.url),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Medium,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
+                if (!selectionMode) {
+                    IconButton(onClick = onClose, modifier = Modifier.size(26.dp)) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Sekmeyi kapat",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
             }
-            if (!selectionMode) {
-                IconButton(onClick = onClose, modifier = Modifier.size(34.dp)) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Sekmeyi kapat",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp)
-                    )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp, bottom = 8.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.surfaceVariant,
+                                MaterialTheme.colorScheme.background
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                ) {
+                    if (tab.hasPage) {
+                        SiteAvatar(host = host, label = tab.displayTitle, size = 44.dp, corner = 14.dp)
+                        Spacer(Modifier.height(10.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = if (UrlUtils.isSecure(tab.url)) {
+                                    Icons.Filled.Lock
+                                } else {
+                                    Icons.Filled.Public
+                                },
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = host.ifBlank { tab.url },
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        if (tab.showHome) {
+                            Spacer(Modifier.height(6.dp))
+                            Text(
+                                text = "Ana sayfada duruyor",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                maxLines = 1
+                            )
+                        }
+                        if (tab.desktopMode) {
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = "Masaüstü",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.tertiary,
+                                maxLines = 1
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = if (tab.incognito) "Gizli sekme" else "Yeni sekme",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
@@ -467,12 +578,13 @@ private fun TabRow(
 @Composable
 private fun GroupDialog(
     initialName: String,
+    initialColor: Long,
     title: String,
     onDismiss: () -> Unit,
     onConfirm: (String, Long) -> Unit
 ) {
     var name by remember { mutableStateOf(initialName) }
-    var color by remember { mutableStateOf(TabGroup.COLORS.first()) }
+    var color by remember { mutableStateOf(initialColor) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -487,17 +599,17 @@ private fun GroupDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(16.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    TabGroup.COLORS.take(8).forEach { option ->
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TabGroup.COLORS.forEach { option ->
                         Box(
                             modifier = Modifier
-                                .size(28.dp)
-                                .clip(RoundedCornerShape(14.dp))
+                                .size(26.dp)
+                                .clip(RoundedCornerShape(13.dp))
                                 .background(Color(option))
                                 .border(
                                     width = if (option == color) 3.dp else 0.dp,
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    shape = RoundedCornerShape(14.dp)
+                                    shape = RoundedCornerShape(13.dp)
                                 )
                                 .clickable { color = option }
                         )
