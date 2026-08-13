@@ -84,7 +84,7 @@ class TabManager {
         groups.add(TabGroup(id, name, color))
     }
 
-    fun setCurrentTabId(id: String?) {
+    fun restoreCurrentTab(id: String?) {
         val tab = tabs.firstOrNull { it.id == id }
         currentTabId = tab?.id ?: tabs.firstOrNull { !it.incognito }?.id
         incognitoMode = false

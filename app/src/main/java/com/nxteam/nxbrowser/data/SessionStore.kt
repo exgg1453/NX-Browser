@@ -77,7 +77,7 @@ class SessionStore(context: Context) {
             if (tabManager.tabs.isEmpty()) return false
 
             val currentId = if (root.isNull("currentTabId")) null else root.getString("currentTabId")
-            tabManager.setCurrentTabId(currentId)
+            tabManager.restoreCurrentTab(currentId)
             true
         } catch (e: Exception) {
             e.printStackTrace()
