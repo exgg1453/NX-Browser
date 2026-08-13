@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.NXBrowser" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#FFF3F5FA</item>
+        <item name="android:statusBarColor">#FFF3F5FA</item>
+        <item name="android:navigationBarColor">#FFF3F5FA</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
