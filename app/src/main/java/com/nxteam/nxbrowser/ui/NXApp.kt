@@ -130,7 +130,7 @@ fun NXApp(host: BrowserHost, pendingUrl: String?, onPendingUrlConsumed: () -> Un
                         route = ROUTE_BROWSER
                     },
                     onSwitchMode = { incognito ->
-                        tabManager.setIncognitoMode(incognito)
+                        tabManager.switchIncognitoMode(incognito)
                         if (tabManager.visibleTabs(incognito).isEmpty()) {
                             tabManager.newTab(incognito = incognito)
                         } else {
@@ -235,7 +235,7 @@ fun NXApp(host: BrowserHost, pendingUrl: String?, onPendingUrlConsumed: () -> Un
                         onOpenExtensions = { route = ROUTE_EXTENSIONS },
                         onToggleIncognito = {
                             val target = !tabManager.incognitoMode
-                            tabManager.setIncognitoMode(target)
+                            tabManager.switchIncognitoMode(target)
                             val existing = tabManager.visibleTabs(target)
                             if (existing.isEmpty()) {
                                 tabManager.newTab(incognito = target)

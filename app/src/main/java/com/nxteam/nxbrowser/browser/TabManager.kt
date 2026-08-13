@@ -30,7 +30,7 @@ class TabManager {
 
     fun visibleTabs(incognito: Boolean): List<BrowserTab> = tabs.filter { it.incognito == incognito }
 
-    fun setIncognitoMode(value: Boolean) {
+    fun switchIncognitoMode(value: Boolean) {
         incognitoMode = value
     }
 
