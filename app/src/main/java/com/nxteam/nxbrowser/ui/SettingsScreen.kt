@@ -27,7 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.nxteam.nxbrowser.R
 import com.nxteam.nxbrowser.data.Prefs
 import com.nxteam.nxbrowser.data.SearchEngines
 import com.nxteam.nxbrowser.data.SettingsStore
@@ -48,84 +50,93 @@ fun SettingsScreen(
             .background(MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.systemBars)
     ) {
-        ScreenTopBar(title = "Ayarlar", onBack = onBack)
+        ScreenTopBar(title = stringResource(R.string.settings), onBack = onBack)
 
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            SettingsSection("Arama")
+            SettingsSection(stringResource(R.string.section_search))
             SettingsRow(
-                title = "Arama motoru",
+                title = stringResource(R.string.search_engine),
                 subtitle = SearchEngines.byId(prefs.searchEngine).label,
                 onClick = { showEnginePicker = true }
             )
 
-            SettingsSection("Görünüm")
+            SettingsSection(stringResource(R.string.section_appearance))
             SettingsRow(
-                title = "Tema",
+                title = stringResource(R.string.theme),
                 subtitle = when (prefs.themeMode) {
-                    "dark" -> "Koyu"
-                    "light" -> "Açık"
-                    else -> "Sistem"
+                    "dark" -> stringResource(R.string.theme_dark)
+                    "light" -> stringResource(R.string.theme_light)
+                    else -> stringResource(R.string.theme_system)
                 },
                 onClick = { showThemePicker = true }
             )
             SettingsToggle(
-                title = "Varsayılan masaüstü modu",
-                subtitle = "Siteleri masaüstü sürümüyle aç",
+                title = stringResource(R.string.desktop_default),
+                subtitle = stringResource(R.string.desktop_default_summary),
                 checked = prefs.desktopModeDefault,
                 onChange = { settings.setDesktopModeDefault(it) }
             )
+            SettingsToggle(
+                title = stringResource(R.string.dark_web_content),
+                subtitle = stringResource(R.string.dark_web_content_summary),
+                checked = prefs.darkWebContent,
+                onChange = { settings.setDarkWebContent(it) }
+            )
 
-            SettingsSection("Site davranışı")
+            SettingsSection(stringResource(R.string.section_site_behaviour))
             SettingsToggle(
                 title = "JavaScript",
-                subtitle = "Kapatmak bazı siteleri bozar",
+                subtitle = stringResource(R.string.javascript_summary),
                 checked = prefs.javaScriptEnabled,
                 onChange = { settings.setJavaScriptEnabled(it) }
             )
             SettingsToggle(
-                title = "Görselleri yükle",
-                subtitle = "Kapalıyken veri tasarrufu sağlar",
+                title = stringResource(R.string.load_images),
+                subtitle = stringResource(R.string.load_images_summary),
                 checked = prefs.loadImages,
                 onChange = { settings.setLoadImages(it) }
             )
             SettingsToggle(
-                title = "Açılır pencereleri engelle",
-                subtitle = "İstenmeyen yeni sekmeleri durdurur",
+                title = stringResource(R.string.block_popups),
+                subtitle = stringResource(R.string.block_popups_summary),
                 checked = prefs.blockPopups,
                 onChange = { settings.setBlockPopups(it) }
             )
 
-            SettingsSection("Gizlilik")
+            SettingsSection(stringResource(R.string.section_privacy))
             SettingsToggle(
-                title = "İzlemeyi reddet",
-                subtitle = "Sitelere DNT sinyali gönder",
+                title = stringResource(R.string.do_not_track),
+                subtitle = stringResource(R.string.do_not_track_summary),
                 checked = prefs.doNotTrack,
                 onChange = { settings.setDoNotTrack(it) }
             )
             SettingsToggle(
-                title = "Çıkışta verileri sil",
-                subtitle = "Uygulama kapanınca geçmiş, çerez ve önbelleği temizle",
+                title = stringResource(R.string.clear_on_exit),
+                subtitle = stringResource(R.string.clear_on_exit_summary),
                 checked = prefs.clearOnExit,
                 onChange = { settings.setClearOnExit(it) }
             )
             SettingsRow(
-                title = "Gezinti verilerini temizle",
-                subtitle = "Geçmiş, çerezler, önbellek, site verileri",
+                title = stringResource(R.string.clear_browsing_data),
+                subtitle = stringResource(R.string.clear_browsing_data_summary),
                 onClick = onOpenClearData
             )
 
-            SettingsSection("Sekmeler")
+            SettingsSection(stringResource(R.string.section_tabs))
             SettingsToggle(
-                title = "Sekmeleri geri yükle",
-                subtitle = "Uygulama açıldığında açık sekmelere devam et",
+                title = stringResource(R.string.restore_tabs),
+                subtitle = stringResource(R.string.restore_tabs_summary),
                 checked = prefs.restoreTabs,
                 onChange = { settings.setRestoreTabs(it) }
             )
 
-            SettingsSection("Hakkında")
+            SettingsSection(stringResource(R.string.section_about))
             SettingsRow(
                 title = "NX Browser",
-                subtitle = "Sürüm 1.0.0 · NX Team",
+                subtitle = stringResource(
+                    R.string.about_summary,
+                    stringResource(R.string.version_name)
+                ),
                 onClick = {}
             )
             Spacer(Modifier.height(28.dp))
@@ -135,7 +146,7 @@ fun SettingsScreen(
     if (showEnginePicker) {
         AlertDialog(
             onDismissRequest = { showEnginePicker = false },
-            title = { Text("Arama motoru") },
+            title = { Text(stringResource(R.string.search_engine)) },
             text = {
                 Column {
                     SearchEngines.all.forEach { engine ->
@@ -162,16 +173,16 @@ fun SettingsScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showEnginePicker = false }) { Text("Kapat") }
+                TextButton(onClick = { showEnginePicker = false }) { Text(stringResource(R.string.close)) }
             }
         )
     }
 
     if (showThemePicker) {
-        val options = listOf("system" to "Sistem", "light" to "Açık", "dark" to "Koyu")
+        val options = listOf("system" to stringResource(R.string.theme_system), "light" to stringResource(R.string.theme_light), "dark" to stringResource(R.string.theme_dark))
         AlertDialog(
             onDismissRequest = { showThemePicker = false },
-            title = { Text("Tema") },
+            title = { Text(stringResource(R.string.theme)) },
             text = {
                 Column {
                     options.forEach { option ->
@@ -198,7 +209,7 @@ fun SettingsScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showThemePicker = false }) { Text("Kapat") }
+                TextButton(onClick = { showThemePicker = false }) { Text(stringResource(R.string.close)) }
             }
         )
     }

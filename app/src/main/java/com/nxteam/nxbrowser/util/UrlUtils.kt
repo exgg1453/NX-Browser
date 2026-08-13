@@ -68,4 +68,14 @@ object UrlUtils {
     }
 
     fun isSecure(url: String): Boolean = url.startsWith("https://")
+
+    fun isDarkTheme(context: android.content.Context, themeMode: String): Boolean = when (themeMode) {
+        "dark" -> true
+        "light" -> false
+        else -> {
+            val mask = context.resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK
+            mask == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        }
+    }
 }

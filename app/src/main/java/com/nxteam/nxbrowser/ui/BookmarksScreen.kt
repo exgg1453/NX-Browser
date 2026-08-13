@@ -26,8 +26,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.nxteam.nxbrowser.R
 import com.nxteam.nxbrowser.data.BookmarkEntry
 import com.nxteam.nxbrowser.util.UrlUtils
 
@@ -45,12 +47,12 @@ fun BookmarksScreen(
             .background(MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.systemBars)
     ) {
-        ScreenTopBar(title = "Yer imleri", onBack = onBack)
+        ScreenTopBar(title = stringResource(R.string.bookmarks), onBack = onBack)
 
         if (bookmarks.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "Henüz yer imi yok",
+                    text = stringResource(R.string.no_bookmarks),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -88,7 +90,7 @@ fun BookmarksScreen(
                     IconButton(onClick = { onTogglePin(entry) }, modifier = Modifier.size(36.dp)) {
                         Icon(
                             imageVector = Icons.Filled.PushPin,
-                            contentDescription = "Sabitle",
+                            contentDescription = stringResource(R.string.pin),
                             tint = if (entry.pinned) {
                                 MaterialTheme.colorScheme.primary
                             } else {
@@ -100,7 +102,7 @@ fun BookmarksScreen(
                     IconButton(onClick = { onDelete(entry) }, modifier = Modifier.size(36.dp)) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Sil",
+                            contentDescription = stringResource(R.string.delete),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(16.dp)
                         )

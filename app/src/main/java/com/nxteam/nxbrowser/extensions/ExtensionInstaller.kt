@@ -2,6 +2,7 @@ package com.nxteam.nxbrowser.extensions
 
 import android.content.Context
 import android.net.Uri
+import com.nxteam.nxbrowser.R
 import java.io.BufferedInputStream
 import java.io.DataInputStream
 import java.io.File
@@ -20,13 +21,37 @@ object ExtensionInstaller {
     private const val CRX_MAGIC = "Cr24"
 
     fun install(context: Context, uri: Uri, rootDir: File): ExtensionInstallResult {
+        val stream = try {
+            context.contentResolver.openInputStream(uri)
+        } catch (e: Exception) {
+            null
+        }
+        if (stream == null) {
+            return ExtensionInstallResult(false, context.getString(R.string.err_file_open))
+        }
+        return installFromStream(context, stream, rootDir)
+    }
+
+    fun install(context: Context, file: File, rootDir: File): ExtensionInstallResult {
+        return try {
+            installFromStream(context, file.inputStream(), rootDir)
+        } catch (e: Exception) {
+            ExtensionInstallResult(
+                false,
+                context.getString(R.string.err_install_failed, e.message ?: "")
+            )
+        }
+    }
+
+    private fun installFromStream(
+        context: Context,
+        stream: InputStream,
+        rootDir: File
+    ): ExtensionInstallResult {
         val id = "ext_" + System.currentTimeMillis().toString(36)
         val target = File(rootDir, id)
 
         return try {
-            val stream = context.contentResolver.openInputStream(uri)
-                ?: return ExtensionInstallResult(false, "Dosya açılamadı")
-
             stream.use { input ->
                 val buffered = BufferedInputStream(input)
                 val zipStream = skipCrxHeader(buffered)
@@ -36,7 +61,10 @@ object ExtensionInstaller {
             val manifestFile = findManifest(target)
             if (manifestFile == null) {
                 target.deleteRecursively()
-                return ExtensionInstallResult(false, "manifest.json bulunamadı")
+                return ExtensionInstallResult(
+                    false,
+                    context.getString(R.string.err_manifest_missing)
+                )
             }
 
             if (manifestFile.parentFile != target && manifestFile.parentFile != null) {
@@ -47,7 +75,10 @@ object ExtensionInstaller {
             val manifest = ExtensionManifest.parse(manifestText)
             if (manifest == null) {
                 target.deleteRecursively()
-                return ExtensionInstallResult(false, "manifest.json okunamadı")
+                return ExtensionInstallResult(
+                    false,
+                    context.getString(R.string.err_manifest_unreadable)
+                )
             }
 
             val extension = InstalledExtension(
@@ -57,10 +88,17 @@ object ExtensionInstaller {
                 enabled = true,
                 installedAt = System.currentTimeMillis()
             )
-            ExtensionInstallResult(true, manifest.name + " kuruldu", extension)
+            ExtensionInstallResult(
+                true,
+                context.getString(R.string.msg_installed, manifest.name),
+                extension
+            )
         } catch (e: Exception) {
             target.deleteRecursively()
-            ExtensionInstallResult(false, "Kurulum başarısız: " + (e.message ?: "bilinmeyen hata"))
+            ExtensionInstallResult(
+                false,
+                context.getString(R.string.err_install_failed, e.message ?: "")
+            )
         }
     }
 
@@ -118,7 +156,7 @@ object ExtensionInstaller {
         while (entry != null) {
             val outFile = File(target, entry.name)
             if (!outFile.canonicalPath.startsWith(canonicalTarget)) {
-                throw SecurityException("Geçersiz arşiv yolu: " + entry.name)
+                throw SecurityException("Invalid archive path: " + entry.name)
             }
             if (entry.isDirectory) {
                 outFile.mkdirs()

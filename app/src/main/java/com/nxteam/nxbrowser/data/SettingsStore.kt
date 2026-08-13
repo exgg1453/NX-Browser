@@ -25,6 +25,7 @@ data class Prefs(
     val blockPopups: Boolean = true,
     val doNotTrack: Boolean = true,
     val desktopModeDefault: Boolean = false,
+    val darkWebContent: Boolean = true,
     val clearOnExit: Boolean = false,
     val restoreTabs: Boolean = true,
     val themeMode: String = "system"
@@ -44,6 +45,7 @@ class SettingsStore(context: Context) {
                 blockPopups = p[KEY_POPUPS] ?: true,
                 doNotTrack = p[KEY_DNT] ?: true,
                 desktopModeDefault = p[KEY_DESKTOP] ?: false,
+                darkWebContent = p[KEY_DARK_WEB] ?: true,
                 clearOnExit = p[KEY_CLEAR_ON_EXIT] ?: false,
                 restoreTabs = p[KEY_RESTORE_TABS] ?: true,
                 themeMode = p[KEY_THEME] ?: "system"
@@ -66,6 +68,8 @@ class SettingsStore(context: Context) {
 
     fun setDesktopModeDefault(value: Boolean) = put(KEY_DESKTOP, value)
 
+    fun setDarkWebContent(value: Boolean) = put(KEY_DARK_WEB, value)
+
     fun setClearOnExit(value: Boolean) = put(KEY_CLEAR_ON_EXIT, value)
 
     fun setRestoreTabs(value: Boolean) = put(KEY_RESTORE_TABS, value)
@@ -85,6 +89,7 @@ class SettingsStore(context: Context) {
         private val KEY_POPUPS = booleanPreferencesKey("popups")
         private val KEY_DNT = booleanPreferencesKey("dnt")
         private val KEY_DESKTOP = booleanPreferencesKey("desktop")
+        private val KEY_DARK_WEB = booleanPreferencesKey("dark_web")
         private val KEY_CLEAR_ON_EXIT = booleanPreferencesKey("clear_on_exit")
         private val KEY_RESTORE_TABS = booleanPreferencesKey("restore_tabs")
         private val KEY_THEME = stringPreferencesKey("theme")

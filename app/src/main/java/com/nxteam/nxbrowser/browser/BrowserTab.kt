@@ -13,7 +13,7 @@ class BrowserTab(
     val createdAt: Long = System.currentTimeMillis()
 ) {
 
-    var title by mutableStateOf("Yeni sekme")
+    var title by mutableStateOf("")
 
     var url by mutableStateOf("")
 
@@ -41,8 +41,7 @@ class BrowserTab(
         get() = when {
             title.isNotBlank() && url.isNotBlank() -> title
             url.isNotBlank() -> url
-            incognito -> "Gizli sekme"
-            else -> "Yeni sekme"
+            else -> ""
         }
 
     val hasPage: Boolean

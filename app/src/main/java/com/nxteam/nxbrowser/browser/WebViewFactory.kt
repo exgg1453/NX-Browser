@@ -12,6 +12,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.nxteam.nxbrowser.data.HistoryDao
 import com.nxteam.nxbrowser.data.Prefs
+import com.nxteam.nxbrowser.util.UrlUtils
 import com.nxteam.nxbrowser.util.UserAgents
 import kotlinx.coroutines.CoroutineScope
 
@@ -72,9 +73,7 @@ object WebViewFactory {
         settings.userAgentString = if (desktop) UserAgents.DESKTOP else UserAgents.mobile(settings.userAgentString)
         tab.desktopMode = desktop
 
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, true)
-        }
+        applyDarkening(webView, current)
 
         webView.isScrollbarFadingEnabled = true
         webView.isVerticalScrollBarEnabled = true
@@ -118,6 +117,18 @@ object WebViewFactory {
         settings.loadsImagesAutomatically = prefs.loadImages
         settings.blockNetworkImage = !prefs.loadImages
         settings.javaScriptCanOpenWindowsAutomatically = !prefs.blockPopups
+        applyDarkening(webView, prefs)
+    }
+
+    fun applyDarkening(webView: WebView, prefs: Prefs) {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) return
+        val dark = prefs.darkWebContent &&
+            UrlUtils.isDarkTheme(webView.context, prefs.themeMode)
+        try {
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(webView.settings, dark)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun applyIncognitoProfile(webView: WebView) {

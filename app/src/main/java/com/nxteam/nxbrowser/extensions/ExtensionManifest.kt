@@ -52,7 +52,7 @@ data class ExtensionManifest(
 
                 ExtensionManifest(
                     manifestVersion = root.optInt("manifest_version", 2),
-                    name = root.optString("name", "Adsız eklenti"),
+                    name = root.optString("name", ""),
                     version = root.optString("version", "0"),
                     description = root.optString("description", ""),
                     contentScripts = scripts,

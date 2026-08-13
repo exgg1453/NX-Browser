@@ -39,9 +39,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.nxteam.nxbrowser.R
 import com.nxteam.nxbrowser.data.HistoryEntry
 import com.nxteam.nxbrowser.privacy.ClearOptions
 import com.nxteam.nxbrowser.util.UrlUtils
@@ -75,13 +77,13 @@ fun HistoryScreen(
             .windowInsetsPadding(WindowInsets.systemBars)
     ) {
         ScreenTopBar(
-            title = "Geçmiş",
+            title = stringResource(R.string.history),
             onBack = onBack,
             action = {
                 IconButton(onClick = { showClearDialog = true }) {
                     Icon(
                         imageVector = Icons.Filled.DeleteSweep,
-                        contentDescription = "Temizle",
+                        contentDescription = stringResource(R.string.clear),
                         tint = MaterialTheme.colorScheme.error
                     )
                 }
@@ -92,7 +94,7 @@ fun HistoryScreen(
             value = search,
             onValueChange = { search = it },
             singleLine = true,
-            placeholder = { Text("Geçmişte ara") },
+            placeholder = { Text(stringResource(R.string.search_history)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 6.dp)
@@ -101,7 +103,7 @@ fun HistoryScreen(
         if (filtered.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "Geçmiş boş",
+                    text = stringResource(R.string.history_empty),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -140,7 +142,7 @@ fun HistoryScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
-                                contentDescription = "Sil",
+                                contentDescription = stringResource(R.string.delete),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -176,15 +178,15 @@ fun ClearDataDialog(
     var rangeIndex by remember { mutableStateOf(3) }
 
     val ranges = listOf(
-        "Son 1 saat" to 3600_000L,
-        "Son 24 saat" to 86_400_000L,
-        "Son 7 gün" to 604_800_000L,
-        "Tüm zamanlar" to -1L
+        stringResource(R.string.range_hour) to 3600_000L,
+        stringResource(R.string.range_day) to 86_400_000L,
+        stringResource(R.string.range_week) to 604_800_000L,
+        stringResource(R.string.range_all) to -1L
     )
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Verileri temizle") },
+        title = { Text(stringResource(R.string.clear_data)) },
         text = {
             Column {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -213,12 +215,12 @@ fun ClearDataDialog(
                     }
                 }
                 Spacer(Modifier.height(10.dp))
-                CheckRow("Gezinme geçmişi", history) { history = it }
-                CheckRow("Çerezler ve oturumlar", cookies) { cookies = it }
-                CheckRow("Önbellek", cache) { cache = it }
-                CheckRow("Site verileri", siteStorage) { siteStorage = it }
-                CheckRow("Form ve şifre verileri", formData) { formData = it }
-                CheckRow("Yer imleri", bookmarks) { bookmarks = it }
+                CheckRow(stringResource(R.string.clear_history), history) { history = it }
+                CheckRow(stringResource(R.string.clear_cookies), cookies) { cookies = it }
+                CheckRow(stringResource(R.string.clear_cache), cache) { cache = it }
+                CheckRow(stringResource(R.string.clear_site_data), siteStorage) { siteStorage = it }
+                CheckRow(stringResource(R.string.clear_form_data), formData) { formData = it }
+                CheckRow(stringResource(R.string.bookmarks), bookmarks) { bookmarks = it }
             }
         },
         confirmButton = {
@@ -236,11 +238,11 @@ fun ClearDataDialog(
                     )
                 )
             }) {
-                Text("Temizle", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.clear), color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("İptal") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }
@@ -278,7 +280,7 @@ fun ScreenTopBar(
         IconButton(onClick = onBack) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Geri",
+                contentDescription = stringResource(R.string.back),
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -293,6 +295,6 @@ fun ScreenTopBar(
 }
 
 private fun formatTime(millis: Long): String {
-    val formatter = SimpleDateFormat("dd MMM HH:mm", Locale("tr"))
+    val formatter = SimpleDateFormat("dd MMM HH:mm", Locale.getDefault())
     return formatter.format(Date(millis))
 }

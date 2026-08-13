@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.nxteam.nxbrowser.R
 import androidx.compose.ui.unit.sp
 import com.nxteam.nxbrowser.data.BookmarkEntry
 import com.nxteam.nxbrowser.data.HistoryEntry
@@ -107,7 +109,7 @@ fun HomeScreen(
             item {
                 Spacer(Modifier.height(26.dp))
                 SectionTitle(
-                    text = "Kısayollar",
+                    text = stringResource(R.string.shortcuts),
                     modifier = Modifier.padding(horizontal = 22.dp)
                 )
                 Spacer(Modifier.height(10.dp))
@@ -123,7 +125,7 @@ fun HomeScreen(
             item {
                 Spacer(Modifier.height(26.dp))
                 SectionTitle(
-                    text = "Kaldığın yerden devam et",
+                    text = stringResource(R.string.continue_browsing),
                     modifier = Modifier.padding(horizontal = 22.dp)
                 )
                 Spacer(Modifier.height(8.dp))
@@ -174,16 +176,16 @@ private fun HomeHeader(incognito: Boolean) {
         }
         Spacer(Modifier.height(14.dp))
         Text(
-            text = if (incognito) "Gizli Mod" else "NX Browser",
+            text = if (incognito) stringResource(R.string.incognito_mode) else "NX Browser",
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(4.dp))
         Text(
             text = if (incognito) {
-                "Geçmiş, çerez ve site verisi kaydedilmiyor"
+                stringResource(R.string.incognito_subtitle)
             } else {
-                "Hızlı, temiz ve tamamen senin kontrolünde"
+                stringResource(R.string.home_subtitle)
             },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -222,7 +224,7 @@ private fun HomeSearchBar(
             )
             Spacer(Modifier.width(14.dp))
             Text(
-                text = if (incognito) "Gizli olarak ara" else "$searchEngineLabel ile ara veya adres yaz",
+                text = if (incognito) stringResource(R.string.search_incognito) else "$searchEngineLabel ile ara veya adres yaz",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -248,7 +250,7 @@ private fun QuickActionRow(
         item {
             QuickChip(
                 icon = Icons.Filled.VisibilityOff,
-                label = if (incognito) "Normal sekme" else "Gizli sekme",
+                label = if (incognito) stringResource(R.string.normal_tab) else stringResource(R.string.incognito_tab),
                 accent = NXViolet,
                 onClick = onOpenIncognito
             )
@@ -256,7 +258,7 @@ private fun QuickActionRow(
         item {
             QuickChip(
                 icon = Icons.Filled.Extension,
-                label = "Eklentiler",
+                label = stringResource(R.string.extensions),
                 accent = NXTeal,
                 onClick = onOpenExtensions
             )
@@ -264,7 +266,7 @@ private fun QuickActionRow(
         item {
             QuickChip(
                 icon = Icons.Filled.Bookmarks,
-                label = "Yer imleri",
+                label = stringResource(R.string.bookmarks),
                 accent = NXBlue,
                 onClick = onOpenBookmarks
             )
@@ -272,7 +274,7 @@ private fun QuickActionRow(
         item {
             QuickChip(
                 icon = Icons.Filled.History,
-                label = "Geçmiş",
+                label = stringResource(R.string.history),
                 accent = Color(0xFFE0703A),
                 onClick = onOpenHistory
             )
@@ -280,7 +282,7 @@ private fun QuickActionRow(
         item {
             QuickChip(
                 icon = Icons.Filled.CleaningServices,
-                label = "Hızlı temizlik",
+                label = stringResource(R.string.quick_clean),
                 accent = Color(0xFFD9455F),
                 onClick = onQuickClean
             )
@@ -419,13 +421,13 @@ private fun IncognitoNotice() {
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Text(
-                text = "Gizli modda neler olmuyor",
+                text = stringResource(R.string.incognito_notice_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Gezinme geçmişi kaydedilmez, çerezler ve site verileri ayrı bir profilde tutulur ve tüm gizli sekmeleri kapattığında silinir. Form verisi ve önbellek de saklanmaz.",
+                text = stringResource(R.string.incognito_notice_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

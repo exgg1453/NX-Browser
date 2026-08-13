@@ -197,7 +197,7 @@ fun NXApp(host: BrowserHost, pendingUrl: String?, onPendingUrlConsumed: () -> Un
             ROUTE_EXTENSIONS -> {
                 ExtensionsScreen(
                     manager = app.extensionManager,
-                    onInstall = { host.pickExtensionPackage() },
+                    onInstallFromFile = { host.pickExtensionPackage() },
                     onBack = { route = ROUTE_BROWSER }
                 )
                 BackHandler { route = ROUTE_BROWSER }

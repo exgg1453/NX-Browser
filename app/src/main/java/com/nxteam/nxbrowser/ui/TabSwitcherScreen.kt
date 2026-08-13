@@ -50,12 +50,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.nxteam.nxbrowser.R
 import com.nxteam.nxbrowser.browser.BrowserTab
 import com.nxteam.nxbrowser.browser.TabGroup
 import com.nxteam.nxbrowser.browser.TabManager
@@ -106,7 +108,7 @@ fun TabSwitcherScreen(
                 IconButton(onClick = { showGroupDialog = true }) {
                     Icon(
                         imageVector = Icons.Filled.CreateNewFolder,
-                        contentDescription = "Grup oluştur",
+                        contentDescription = stringResource(R.string.create_group),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -116,7 +118,7 @@ fun TabSwitcherScreen(
                 }) {
                     Icon(
                         imageVector = Icons.Filled.LayersClear,
-                        contentDescription = "Gruptan çıkar",
+                        contentDescription = stringResource(R.string.remove_from_group),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -126,14 +128,14 @@ fun TabSwitcherScreen(
                 }) {
                     Icon(
                         imageVector = Icons.Filled.DeleteSweep,
-                        contentDescription = "Seçilenleri kapat",
+                        contentDescription = stringResource(R.string.close_selected),
                         tint = MaterialTheme.colorScheme.error
                     )
                 }
                 IconButton(onClick = { selection = emptySet() }) {
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = "Seçimi bırak",
+                        contentDescription = stringResource(R.string.clear_selection),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -141,21 +143,21 @@ fun TabSwitcherScreen(
                 IconButton(onClick = { tabManager.closeAll(incognito) }) {
                     Icon(
                         imageVector = Icons.Filled.DeleteSweep,
-                        contentDescription = "Tümünü kapat",
+                        contentDescription = stringResource(R.string.close_all),
                         tint = MaterialTheme.colorScheme.error
                     )
                 }
                 IconButton(onClick = onNewTab) {
                     Icon(
                         imageVector = Icons.Filled.Add,
-                        contentDescription = "Yeni sekme",
+                        contentDescription = stringResource(R.string.new_tab),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
                 IconButton(onClick = onClose) {
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = "Kapat",
+                        contentDescription = stringResource(R.string.close),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -165,7 +167,7 @@ fun TabSwitcherScreen(
         if (total == 0) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = if (incognito) "Açık gizli sekme yok" else "Açık sekme yok",
+                    text = if (incognito) stringResource(R.string.no_incognito_tabs) else stringResource(R.string.no_tabs),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -234,7 +236,7 @@ fun TabSwitcherScreen(
                         span = { GridItemSpan(maxLineSpan) }
                     ) {
                         SectionTitle(
-                            text = "Gruplanmamış",
+                            text = stringResource(R.string.ungrouped),
                             modifier = Modifier.padding(start = 6.dp, top = 8.dp)
                         )
                     }
@@ -268,9 +270,9 @@ fun TabSwitcherScreen(
 
     if (showGroupDialog) {
         GroupDialog(
-            initialName = "Yeni grup",
+            initialName = stringResource(R.string.new_group),
             initialColor = TabGroup.COLORS.first(),
-            title = "Grup oluştur",
+            title = stringResource(R.string.create_group),
             onDismiss = { showGroupDialog = false },
             onConfirm = { name, color ->
                 val group = tabManager.createGroup(name, color)
@@ -287,7 +289,7 @@ fun TabSwitcherScreen(
         GroupDialog(
             initialName = group?.name ?: "",
             initialColor = group?.color ?: TabGroup.COLORS.first(),
-            title = "Grubu düzenle",
+            title = stringResource(R.string.edit_group),
             onDismiss = { renameGroupId = null },
             onConfirm = { name, color ->
                 tabManager.renameGroup(renaming, name)
@@ -316,12 +318,12 @@ private fun ModeToggle(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             ModeChip(
-                label = "Sekmeler $normalCount",
+                label = stringResource(R.string.tabs_count, normalCount),
                 active = !incognito,
                 onClick = { onSwitchMode(false) }
             )
             ModeChip(
-                label = "Gizli $incognitoCount",
+                label = stringResource(R.string.incognito_count, incognitoCount),
                 active = incognito,
                 onClick = { onSwitchMode(true) }
             )
@@ -389,7 +391,7 @@ private fun GroupHeader(
         IconButton(onClick = onRename, modifier = Modifier.size(32.dp)) {
             Icon(
                 imageVector = Icons.Filled.Edit,
-                contentDescription = "Düzenle",
+                contentDescription = stringResource(R.string.edit),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )
@@ -397,7 +399,7 @@ private fun GroupHeader(
         IconButton(onClick = onUngroup, modifier = Modifier.size(32.dp)) {
             Icon(
                 imageVector = Icons.Filled.LayersClear,
-                contentDescription = "Grubu dağıt",
+                contentDescription = stringResource(R.string.ungroup),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )
@@ -405,7 +407,7 @@ private fun GroupHeader(
         IconButton(onClick = onCloseGroup, modifier = Modifier.size(32.dp)) {
             Icon(
                 imageVector = Icons.Filled.DeleteSweep,
-                contentDescription = "Grubu kapat",
+                contentDescription = stringResource(R.string.close_group),
                 tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(18.dp)
             )
@@ -413,7 +415,7 @@ private fun GroupHeader(
         IconButton(onClick = onToggle, modifier = Modifier.size(32.dp)) {
             Icon(
                 imageVector = if (group.collapsed) Icons.Filled.ExpandMore else Icons.Filled.ExpandLess,
-                contentDescription = "Aç kapa",
+                contentDescription = stringResource(R.string.expand_collapse),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(20.dp)
             )
@@ -434,6 +436,11 @@ private fun TabCard(
     onClose: () -> Unit
 ) {
     val host = UrlUtils.host(tab.url)
+    val fallbackLabel = if (tab.incognito) {
+        stringResource(R.string.incognito_tab)
+    } else {
+        stringResource(R.string.new_tab)
+    }
     val borderColor = when {
         selected -> MaterialTheme.colorScheme.primary
         isCurrent -> accent
@@ -475,14 +482,14 @@ private fun TabCard(
                 } else {
                     SiteAvatar(
                         host = host,
-                        label = tab.displayTitle,
+                        label = fallbackLabel,
                         size = 18.dp,
                         corner = 6.dp
                     )
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = tab.displayTitle,
+                    text = tab.displayTitle.ifBlank { fallbackLabel },
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Medium,
@@ -494,7 +501,7 @@ private fun TabCard(
                     IconButton(onClick = onClose, modifier = Modifier.size(26.dp)) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Sekmeyi kapat",
+                            contentDescription = stringResource(R.string.close_tab),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(14.dp)
                         )
@@ -522,7 +529,7 @@ private fun TabCard(
                     modifier = Modifier.padding(horizontal = 10.dp)
                 ) {
                     if (tab.hasPage) {
-                        SiteAvatar(host = host, label = tab.displayTitle, size = 44.dp, corner = 14.dp)
+                        SiteAvatar(host = host, label = fallbackLabel, size = 44.dp, corner = 14.dp)
                         Spacer(Modifier.height(10.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
@@ -547,7 +554,7 @@ private fun TabCard(
                         if (tab.showHome) {
                             Spacer(Modifier.height(6.dp))
                             Text(
-                                text = "Ana sayfada duruyor",
+                                text = stringResource(R.string.parked_on_home),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 maxLines = 1
@@ -556,7 +563,7 @@ private fun TabCard(
                         if (tab.desktopMode) {
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                text = "Masaüstü",
+                                text = stringResource(R.string.desktop),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.tertiary,
                                 maxLines = 1
@@ -564,7 +571,7 @@ private fun TabCard(
                         }
                     } else {
                         Text(
-                            text = if (tab.incognito) "Gizli sekme" else "Yeni sekme",
+                            text = fallbackLabel,
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -585,6 +592,7 @@ private fun GroupDialog(
 ) {
     var name by remember { mutableStateOf(initialName) }
     var color by remember { mutableStateOf(initialColor) }
+    val fallbackName = stringResource(R.string.default_group_name)
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -595,7 +603,7 @@ private fun GroupDialog(
                     value = name,
                     onValueChange = { name = it },
                     singleLine = true,
-                    label = { Text("Grup adı") },
+                    label = { Text(stringResource(R.string.group_name)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(16.dp))
@@ -618,12 +626,12 @@ private fun GroupDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(name.ifBlank { "Grup" }, color) }) {
-                Text("Tamam")
+            TextButton(onClick = { onConfirm(name.ifBlank { fallbackName }, color) }) {
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("İptal") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }

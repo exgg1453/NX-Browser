@@ -34,10 +34,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.nxteam.nxbrowser.R
 import androidx.compose.ui.unit.sp
 import com.nxteam.nxbrowser.browser.BrowserHost
 import com.nxteam.nxbrowser.browser.BrowserTab
@@ -191,7 +193,7 @@ private fun SuggestionOverlay(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = "$searchEngineLabel ile ara",
+                        text = stringResource(R.string.search_with, searchEngineLabel),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -259,7 +261,7 @@ private fun BottomBar(
             IconButton(onClick = onBack, enabled = canGoBack) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Geri",
+                    contentDescription = stringResource(R.string.back),
                     tint = if (canGoBack) {
                         MaterialTheme.colorScheme.onSurface
                     } else {
@@ -270,7 +272,7 @@ private fun BottomBar(
             IconButton(onClick = onForward, enabled = canGoForward) {
                 Icon(
                     imageVector = Icons.Filled.ArrowForward,
-                    contentDescription = "İleri",
+                    contentDescription = stringResource(R.string.forward),
                     tint = if (canGoForward) {
                         MaterialTheme.colorScheme.onSurface
                     } else {
@@ -281,7 +283,7 @@ private fun BottomBar(
             IconButton(onClick = onGoHome) {
                 Icon(
                     imageVector = Icons.Filled.Home,
-                    contentDescription = "Ana sayfa",
+                    contentDescription = stringResource(R.string.home),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -322,7 +324,7 @@ private fun BottomBar(
             IconButton(onClick = onOpenMenu) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "Menü",
+                    contentDescription = stringResource(R.string.menu),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }

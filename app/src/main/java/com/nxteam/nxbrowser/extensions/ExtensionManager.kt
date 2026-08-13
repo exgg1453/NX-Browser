@@ -3,6 +3,9 @@ package com.nxteam.nxbrowser.extensions
 import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
+import com.nxteam.nxbrowser.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -20,6 +23,38 @@ class ExtensionManager(private val context: Context) {
 
     fun install(uri: Uri): ExtensionInstallResult {
         val result = ExtensionInstaller.install(context, uri, rootDir)
+        val extension = result.extension
+        if (result.success && extension != null) {
+            extensions.add(extension)
+            persist()
+        }
+        return result
+    }
+
+    suspend fun installFromStoreUrl(rawUrl: String): ExtensionInstallResult {
+        val id = ChromeWebStore.extractId(rawUrl)
+            ?: return ExtensionInstallResult(
+                false,
+                context.getString(R.string.err_invalid_store_link)
+            )
+
+        val file = withContext(Dispatchers.IO) {
+            try {
+                ChromeWebStore.download(id, context.cacheDir)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        } ?: return ExtensionInstallResult(
+            false,
+            context.getString(R.string.err_download_failed)
+        )
+
+        val result = withContext(Dispatchers.IO) {
+            ExtensionInstaller.install(context, file, rootDir)
+        }
+        file.delete()
+
         val extension = result.extension
         if (result.success && extension != null) {
             extensions.add(extension)

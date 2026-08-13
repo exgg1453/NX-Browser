@@ -200,9 +200,9 @@ class MainActivity : ComponentActivity(), BrowserHost {
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
             val manager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
             manager.enqueue(request)
-            Toast.makeText(this, "İndiriliyor: $fileName", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.msg_downloading_file, fileName), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Toast.makeText(this, "İndirme başlatılamadı", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.err_download_start), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -235,14 +235,14 @@ class MainActivity : ComponentActivity(), BrowserHost {
         intent.type = "text/plain"
         intent.putExtra(Intent.EXTRA_SUBJECT, title)
         intent.putExtra(Intent.EXTRA_TEXT, url)
-        startActivity(Intent.createChooser(intent, "Paylaş"))
+        startActivity(Intent.createChooser(intent, getString(R.string.share)))
     }
 
     override fun pickExtensionPackage() {
         try {
             extensionPickerLauncher.launch(arrayOf("*/*"))
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, "Dosya seçici bulunamadı", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.err_no_file_picker), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -257,7 +257,7 @@ class MainActivity : ComponentActivity(), BrowserHost {
             startActivity(intent)
             true
         } catch (e: Exception) {
-            Toast.makeText(this, "Bu bağlantıyı açacak uygulama yok", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.err_no_app_for_link), Toast.LENGTH_SHORT).show()
             true
         }
     }

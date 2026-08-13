@@ -32,8 +32,10 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.nxteam.nxbrowser.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,20 +70,20 @@ fun MenuSheet(
                     .padding(horizontal = 12.dp, vertical = 6.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                MenuAction(Icons.Filled.Add, "Yeni sekme", onNewTab)
-                MenuAction(Icons.Filled.VisibilityOff, "Gizli sekme", onNewIncognitoTab)
-                MenuAction(Icons.Filled.StarBorder, "Yer imi", onAddBookmark)
+                MenuAction(Icons.Filled.Add, stringResource(R.string.new_tab), onNewTab)
+                MenuAction(Icons.Filled.VisibilityOff, stringResource(R.string.incognito_tab), onNewIncognitoTab)
+                MenuAction(Icons.Filled.StarBorder, stringResource(R.string.add_bookmark), onAddBookmark)
                 if (canShare) {
-                    MenuAction(Icons.Filled.Share, "Paylaş", onShare)
+                    MenuAction(Icons.Filled.Share, stringResource(R.string.share), onShare)
                 }
             }
 
             Spacer(Modifier.height(8.dp))
 
-            MenuRow(Icons.Filled.Extension, "Eklentiler", onOpenExtensions)
-            MenuRow(Icons.Filled.Bookmarks, "Yer imleri", onOpenBookmarks)
+            MenuRow(Icons.Filled.Extension, stringResource(R.string.extensions), onOpenExtensions)
+            MenuRow(Icons.Filled.Bookmarks, stringResource(R.string.bookmarks), onOpenBookmarks)
             if (!incognito) {
-                MenuRow(Icons.Filled.History, "Geçmiş", onOpenHistory)
+                MenuRow(Icons.Filled.History, stringResource(R.string.history), onOpenHistory)
             }
 
             Row(
@@ -99,7 +101,7 @@ fun MenuSheet(
                 )
                 Spacer(Modifier.width(18.dp))
                 Text(
-                    text = "Masaüstü sitesi",
+                    text = stringResource(R.string.desktop_site),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
@@ -107,9 +109,9 @@ fun MenuSheet(
                 Switch(checked = desktopMode, onCheckedChange = onToggleDesktop)
             }
 
-            MenuRow(Icons.Filled.CleaningServices, "Verileri temizle", onClearData)
-            MenuRow(Icons.Filled.Settings, "Ayarlar", onOpenSettings)
-            MenuRow(Icons.Filled.PowerSettingsNew, "Çıkış", onExit)
+            MenuRow(Icons.Filled.CleaningServices, stringResource(R.string.clear_data), onClearData)
+            MenuRow(Icons.Filled.Settings, stringResource(R.string.settings), onOpenSettings)
+            MenuRow(Icons.Filled.PowerSettingsNew, stringResource(R.string.exit), onExit)
         }
     }
 }

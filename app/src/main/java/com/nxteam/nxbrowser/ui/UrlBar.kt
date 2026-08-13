@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -44,6 +45,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.nxteam.nxbrowser.R
 import com.nxteam.nxbrowser.util.UrlUtils
 
 @Composable
@@ -113,7 +115,7 @@ fun UrlBar(
                     } else {
                         Text(
                             text = if (displayUrl.isBlank()) {
-                                if (incognito) "Gizli olarak ara" else "Ara veya adres yaz"
+                                if (incognito) stringResource(R.string.search_incognito) else stringResource(R.string.url_hint)
                             } else {
                                 UrlUtils.prettyUrl(displayUrl)
                             },
@@ -138,7 +140,7 @@ fun UrlBar(
                     IconButton(onClick = onCancelEditing, modifier = Modifier.size(32.dp)) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Kapat",
+                            contentDescription = stringResource(R.string.close),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
@@ -147,7 +149,7 @@ fun UrlBar(
                     IconButton(onClick = onReload, modifier = Modifier.size(32.dp)) {
                         Icon(
                             imageVector = if (isLoading) Icons.Filled.Close else Icons.Filled.Refresh,
-                            contentDescription = "Yenile",
+                            contentDescription = stringResource(R.string.reload),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
