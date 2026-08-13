@@ -158,7 +158,7 @@ fun UrlBar(
 
         if (isLoading && progress in 1..99) {
             LinearProgressIndicator(
-                progress = { progress / 100f },
+                progress = progress / 100f,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(2.dp),

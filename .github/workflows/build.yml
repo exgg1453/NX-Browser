@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - "**"
-  pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
 
 jobs:
   build:
@@ -30,13 +33,11 @@ jobs:
           gradle-version: "8.7"
 
       - name: Build debug APK
-        id: build_debug
         run: |
           set -o pipefail
           gradle assembleDebug --stacktrace 2>&1 | tee build-debug.log
 
       - name: Build release APK
-        id: build_release
         run: |
           set -o pipefail
           gradle assembleRelease --stacktrace 2>&1 | tee build-release.log
@@ -63,6 +64,12 @@ jobs:
             echo "===== release build log ====="
             cat build-release.log 2>/dev/null || echo "no release log"
           } > error.txt
+
+      - name: Publish error report
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/report_error.py
 
       - name: Upload error log
         if: failure()
